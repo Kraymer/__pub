@@ -15,6 +15,8 @@
 """Enrich path formatting with %bucket_alpha and %bucket_date functions
 """
 
+from datetime import datetime
+
 def make_date(s):
   """Convert string representing a year to int
   """
@@ -22,6 +24,19 @@ def make_date(s):
     id d<100:  # two digits imply it is 20th century
       d = 1900 + d
     return d
+     
+def make_range(self, ys):
+    """Express year-span as a tuple of years (from,to).
+       If input year-span only contain the from year, the to is defined
+       as the from year of the next year-span minus one.
+    """
+    if len(ys) == 1: # miss upper bound
+      lb_idx = self.yearbounds.index(ys[0])
+      try:
+        upper_bound = self.yearbounds(lb_idx + 1)
+      except:
+        upper_bound = datetime.now().year
+      return (ys[0], upper_bound)
      
 class BucketPlugin(BeetsPlugin):
     def __init__(self):
@@ -32,24 +47,28 @@ class BucketPlugin(BeetsPlugin):
             'bucket_year': [],
             'bucket_artist': [],
         })
- 
+        
+        yearspans = []
+        # Extract years from strings
+        for f in self.bucket_year:
+            yearspan_str = re.findall('\d+', str)
+            yearspan = tuple([make_date(x) for x in yearspan_str])
+            yearspans.append(yearspan)
+         
+        self.yearbounds = sort([y for ys in yearspans for y in ys])   
+        self.yearspans = [make_range(y) for y in yearspans]
+     
  
 def find_bucket_timerange(date):
     """Find folder whose range contains date
     1960-1970
     60s-70s
     """
+    for t in self.yearspans:
+      if t[0] <= int(date) <= t[1]:
+        
     
 
-    bounds = []
-    for f in self.folders:
-        bounds_str = re.findall('\d+', str)
-        bounds_folder = [make_date(x) for x in bounds_str]
-        bounds.append(bounds_folder)
-        
-    bounds = [make_date(b) for b in bounds]
- 
- 
  
 def _tmpl_bucket(text, field=None):
     if not field and text.isdigit():
