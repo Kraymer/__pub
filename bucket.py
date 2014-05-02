@@ -26,7 +26,7 @@ def make_date(s):
     return d
      
 def make_range(self, ys):
-    """Express year-span as a tuple of years (from,to).
+    """Express year-span as a list of years [from...to].
        If input year-span only contain the from year, the to is defined
        as the from year of the next year-span minus one.
     """
@@ -64,12 +64,12 @@ def find_bucket_timerange(date):
     1960-1970
     60s-70s
     """
-    for t in self.yearspans:
-      if t[0] <= int(date) <= t[1]:
+    for (i, t) in enumerate(self.yearspans):
+      if int(date) in t:
+        return self.bucket_year[i]
+    return date
         
-    
-
- 
+        
 def _tmpl_bucket(text, field=None):
     if not field and text.isdigit():
         field = 'year'
